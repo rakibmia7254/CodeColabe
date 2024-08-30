@@ -49,7 +49,7 @@ Before you begin, ensure you have the following installed:
 
 To start the CodeColabe server, use Uvicorn:
 
-    uvicorn livecodeshare.asgi:application --host 0.0.0.0 --port 8000
+    uvicorn code_colabe.asgi:application --host 0.0.0.0 --port 8000
 
 Navigate to `http://localhost:8000/<workspace_name>/` to start coding live in your workspace.
 
