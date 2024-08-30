@@ -90,7 +90,7 @@
       {% endif %}
 
       // WebSocket connection
-      const socket = new WebSocket(`ws://${window.location.host}/ws/editor/{{ room_uuid }}/`);
+      const socket = new WebSocket(`wss://${window.location.host}/ws/editor/{{ room_uuid }}/`);
       let updating = false;
       editor.on("change", () => {
         if (!updating) {
