@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeColabe - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <header class="bg-white shadow-md">
+      <nav
+        class="container mx-auto px-6 py-3 flex justify-between items-center"
+      >
+        <a href="#" class="text-2xl font-bold text-blue-600">CodeColabe</a>
+       
+      </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+      <h1 class="text-4xl font-bold text-center mb-8">Welcome to CodeColabe</h1>
+      <div class="flex flex-col md:flex-row justify-center items-center gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md w-full md:w-1/3">
+          <h2 class="text-2xl font-semibold mb-4">Create New Workspace</h2>
+          <form method="post">
+            {% csrf_token %}
+            <label for="languages" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select a language</label>
+            <select id="languages" name="language" class="bg-gray-50 mb-4 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <option value="javascript" selected>Javascript</option>
+              <option value="python">Python</option>
+              <option value="c++">C++</option>
+              <option value="c#">C#</option>
+              <option value="php">PHP</option>
+              <option value="ruby">Ruby</option>
+            </select>
+
+            <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+              Create Workspace
+            </button>
+
+          </form>
+          <p class="text-gray-600 mt-4">
+            How to Share Workspace? <strong>Just Share the URL</strong>
+          </p>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

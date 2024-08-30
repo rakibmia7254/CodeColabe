@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeShare - Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/php/php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/ruby/ruby.min.js"></script>
+    <style>
+      /* Set the height of the main container to fill the viewport height */
+      main {
+        height: calc(100vh - 128px); /* 128px is the combined height of header and footer */
+      }
+      /* Set the editor container to fill the available height */
+      .editor-container {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <header class="bg-white shadow-md">
+      <nav
+        class="container mx-auto px-6 py-3 flex justify-between items-center"
+      >
+        <a href="/" class="text-2xl font-bold text-blue-600"
+          >CodeColabe</a
+        >
+        <div class="flex items-center">
+          <p class="text-gray-700 mr-4"><strong>Language:</strong> {{ language }}</p>
+          <button
+            id="save-btn"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+          >
+            Save
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 flex">
+      <div class="flex-grow bg-white rounded-lg shadow-md p-6 mr-4 editor-container">
+        <textarea id="code-editor"></textarea>
+      </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-4 mt-8">
+      <div class="container mx-auto px-6 text-center">
+        &copy; 2024 CodeColabe. All rights reserved.
+      </div>
+    </footer>
+
+    <script>
+      const editor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
+          lineNumbers: true,
+          mode: "{{ mode }}",
+          theme: "dracula",
+          autoCloseBrackets: true,
+          matchBrackets: true,
+          indentUnit: 4,
+          tabSize: 4,
+          indentWithTabs: true,
+          lineWrapping: false,
+      });
+
+
+
+      // Set the editor size to fill the container
+      editor.setSize("100%", "100%");
+
+      document.getElementById("save-btn").addEventListener("click", () => {
+          const code = editor.getValue();
+          const filename = "{{ room_uuid }}.{{ language }}";
+          const blob = new Blob([code], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          link.click();
+      });
+
+      {% if saved_code %}
+        editor.setValue("{{ saved_code }}");
+      {% endif %}
+
+      // WebSocket connection
+      const socket = new WebSocket(`ws://${window.location.host}/ws/editor/{{ room_uuid }}/`);
+      let updating = false;
+      editor.on("change", () => {
+        if (!updating) {
+          socket.send(JSON.stringify({
+            type: "edit",
+            code: editor.getValue(),
+            language : "{{ language }}",
+          }));
+        }
+      });
+
+      socket.onopen = function(event) {
+          console.log('WebSocket connection established');
+      };
+
+      socket.onmessage = function(event) {
+          const message = JSON.parse(event.data);
+          if (message.types === "update" && message.code !== editor.getValue()) {
+              updating = true;
+              editor.setValue(message.code); // Update editor content
+              updating = false;
+          }
+      };
+
+      socket.onclose = function(event) {
+          console.log('WebSocket connection closed');
+      };
+
+      socket.onerror = function(error) {
+          console.error('WebSocket error:', error);
+      };
+      </script>
+  </body>
+</html>
